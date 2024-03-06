@@ -17,7 +17,7 @@ class PostController extends Controller
     {
         $posts = Post::all();
 
-        return view('');
+        return view('admin.posts.index', compact('posts'));
     }
 
     /**
@@ -25,7 +25,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.posts.create');
     }
 
     /**
@@ -33,23 +33,33 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validation = $request->validate([
+            'title' => 'required|max:64',
+            'slug' => 'nullable|max:1000',
+            'content' => 'nullable|max:1000',
+        ]);
+
+        $post = Post::create($validation);
+
+        return redirect()->route('admin.posts.create.show', ['post' => $post->id]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show(string $slug)
     {
-        //
+        $post = Post::where('slug', $slug)->firstOrFail();
+        return view('admin.posts.show', compact('post'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Post $post)
+    public function edit(string $slug)
     {
-        //
+        $post = Post::where('slug', $slug)->firstOrFail();
+        return view('admin.posts.edit',compact('post'));
     }
 
     /**
@@ -57,7 +67,16 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $validation = $request->validate([
+            'title' => 'required|max:64',
+            'slug' => 'nullable|max:1000',
+            'content' => 'nullable|max:1000',
+        ]);
+
+        $post->update($validation);
+
+        return redirect()->route('admin.posts.show', ['post' => $post->id]);
+
     }
 
     /**

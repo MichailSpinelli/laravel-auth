@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title', 'Tutti i post')
+@section('page-title', $post->title)
 
 @section('main-content')
     <div class="row">
@@ -8,10 +8,16 @@
             <div class="card">
                 <div class="card-body">
                     <h1 class="text-center text-success">
-                        Tutti i post
+                        {{ $post->title }}
                     </h1>
-                    <br>
-                    La dashboard è una pagina privata (protetta dal middleware)
+
+                    <h2>
+                        Slug: {{ $post->title }}
+                    </h2>
+
+                    <p>
+                        {{ $post->content }}
+                    </p>
                 </div>
             </div>
         </div>
