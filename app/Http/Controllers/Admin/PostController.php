@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
+// models
 use App\Models\Post;
 
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -18,6 +19,16 @@ class PostController extends Controller
         $posts = Post::all();
 
         return view('admin.posts.index', compact('posts'));
+    }
+
+        /**
+     * Display the specified resource.
+     */
+    public function show(string $slug)
+    {
+        $post = Post::where('slug', $slug)->firstOrFail();
+
+        return view('admin.posts.show', compact('post'));
     }
 
     /**
@@ -33,25 +44,18 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $validation = $request->validate([
+        $validationResult = $request->validate([
             'title' => 'required|max:64',
             'slug' => 'nullable|max:1000',
             'content' => 'nullable|max:1000',
         ]);
 
-        $post = Post::create($validation);
+        $post = Post::create($validationResult);
+        // dd($validationResult);
 
-        return redirect()->route('admin.posts.create.show', ['post' => $post->id]);
+        return redirect()->route('admin.posts.show', ['post' => $post->slug]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $slug)
-    {
-        $post = Post::where('slug', $slug)->firstOrFail();
-        return view('admin.posts.show', compact('post'));
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -65,17 +69,20 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, string $slug)
     {
-        $validation = $request->validate([
+        $post = Post::where('slug', $slug)->firstOrFail();
+        $validationResult = $request->validate([
             'title' => 'required|max:64',
             'slug' => 'nullable|max:1000',
             'content' => 'nullable|max:1000',
         ]);
 
-        $post->update($validation);
+        $post->update($validationResult);
+        // dd($validationResult);
+        return redirect()->route('admin.posts.index');
 
-        return redirect()->route('admin.posts.show', ['post' => $post->id]);
+
 
     }
 
@@ -84,6 +91,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+
+        return redirect()->route('admin.posts.index');
     }
 }
